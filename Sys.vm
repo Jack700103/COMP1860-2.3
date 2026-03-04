@@ -1,81 +1,76 @@
 function Sys.min 0
     push argument 0
     push argument 1
-    sub
-    if-goto MIN_IS_ARG0
+    lt
+    if-goto RETURN_ARG0
     push argument 1
     return
-(MIN_IS_ARG0)
+(RETURN_ARG0)
     push argument 0
     return
 
 function Sys.max 0
     push argument 0
     push argument 1
-    sub
-    if-goto MAX_IS_ARG0
+    gt
+    if-goto RETURN_ARG0
     push argument 1
     return
-(MAX_IS_ARG0)
+(RETURN_ARG0)
     push argument 0
     return
 
 function Sys.range 2
-    push constant 0
-    pop local 0
-    push argument 0
-    pop pointer 0
     push argument 1
-    pop local 1
-    push local 1
-    if-goto LOOP_START
+    push constant 1
+    sub
+    if-goto LOOP_SETUP
     push constant 0
     return
-(LOOP_START)
-    push pointer 0
+(LOOP_SETUP)
+    push argument 0
+    pop pointer 0
     push that 0
-    pop local 2
-    push local 0
-    push constant 0
-    eq
-    if-goto INIT_MIN_MAX
-    push local 2
-    push local 3
-    call Sys.min 2
-    pop local 3
-    push local 2
-    push local 4
-    call Sys.max 2
-    pop local 4
-    goto LOOP_CONTINUE
-(INIT_MIN_MAX)
-    push local 2
-    pop local 3
-    push local 2
-    pop local 4
-(LOOP_CONTINUE)
-    push local 0
-    push constant 1
-    add
     pop local 0
-    push pointer 0
+    push that 0
+    pop local 1
     push constant 1
+    pop local 2
+(LOOP_START)
+    push local 2
+    push argument 1
+    sub
+    if-goto LOOP_END
+    push pointer 0
+    push local 2
     add
     pop pointer 0
-    push local 0
-    push local 1
-    sub
-    if-goto LOOP_START
-    push local 4
+    push that 0
+    pop local 3
     push local 3
+    push local 0
+    call Sys.min 2
+    pop local 0
+    push local 3
+    push local 1
+    call Sys.max 2
+    pop local 1
+    push local 2
+    push constant 1
+    add
+    pop local 2
+    push argument 0
+    pop pointer 0
+    goto LOOP_START
+(LOOP_END)
+    push local 1
+    push local 0
     sub
     return
 
 function Sys.init 0
-    push constant 256
-    pop pointer 1
-    push that 0
-    push that 1
+    push argument 0
+    push argument 1
     call Sys.range 2
     push constant 256
     pop pointer 1
