@@ -1,47 +1,48 @@
-function Sys.max 0
-    push argument 0     
-    push argument 1     
-    gt                 
-    if-true   GT_TRUE  
-    if-false  GT_FALSE
-label GT_TRUE
-    push argument 0     
-    return
-label GT_FALSE
-    push argument 1     
-    return
-
-
 function Sys.min 0
-    push argument 0     
-    push argument 1     
-    lt                 
-    if-true   LT_TRUE  
-    if-false  LT_FALSE
-label LT_TRUE
-    push argument 0    
+    push argument 0  
+    push argument 1  
+    lt              
+    if-true   MIN_FIRST
+    if-false  MIN_SECOND
+MIN_FIRST:
+    push argument 0  
     return
-label LT_FALSE
-    push argument 1     
+MIN_SECOND:
+    push argument 1  
     return
 
+
+function Sys.max 0
+    push argument 0  
+    push argument 1  
+    gt              
+    if-true   MAX_FIRST
+    if-false  MAX_SECOND
+MAX_FIRST:
+    push argument 0  
+    return
+MAX_SECOND:
+    push argument 1  
+    return
 
 
 function Sys.range 2
-    push argument 1     
+    push argument 1  
     push constant 1
-    eq                 
+    eq              
     if-true  RANGE_ZERO
-    push argument 0     
-    call Sys.min 1     
-    pop local 0         
-    push argument 0     
-    call Sys.max 1     
-    pop local 1         
-    push local 1        
-    push local 0        
-    sub                
+
+    push argument 0  
+    pop pointer 0    
+    push constant 0
+    pop local 0      
+    push constant 0
+    pop local 1      
+    
+    push local 1     
+    push local 0     
+    sub             
     return
-label RANGE_ZERO
-    push constant 0     
+RANGE_ZERO:
+    push constant 0  
     return
