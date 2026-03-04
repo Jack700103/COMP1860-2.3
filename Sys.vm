@@ -1,48 +1,97 @@
 function Sys.min 0
-    push argument 0  
-    push argument 1  
-    lt              
-    if-true   MIN_FIRST
-    if-false  MIN_SECOND
+    push argument 0
+    push argument 1
+    lt
+    if-true MIN_FIRST
+    if-false MIN_SECOND
 MIN_FIRST:
-    push argument 0  
+    push argument 0
     return
 MIN_SECOND:
-    push argument 1  
+    push argument 1
     return
 
 
 function Sys.max 0
-    push argument 0  
-    push argument 1  
-    gt              
-    if-true   MAX_FIRST
-    if-false  MAX_SECOND
+    push argument 0
+    push argument 1
+    gt
+    if-true MAX_FIRST
+    if-false MAX_SECOND
 MAX_FIRST:
-    push argument 0  
+    push argument 0
     return
 MAX_SECOND:
-    push argument 1  
+    push argument 1
     return
 
 
 function Sys.range 2
-    push argument 1  
+    push argument 1
     push constant 1
-    eq              
-    if-true  RANGE_ZERO
-
-    push argument 0  
-    pop pointer 0    
+    eq
+    if-true RANGE_ZERO
+    push argument 0
+    pop pointer 0
     push constant 0
-    pop local 0      
+    pop local 0
     push constant 0
-    pop local 1      
-    
-    push local 1     
-    push local 0     
-    sub             
+    pop local 1
+    push argument 0
+    push argument 1
+    add
+    pop pointer 1
+LOOP:
+    push *pointer 0
+    push local 0
+    lt
+    if-true UPDATE_MIN
+    jmp CONTINUE
+UPDATE_MIN:
+    push *pointer 0
+    pop local 0
+CONTINUE:
+    push *pointer 0
+    push local 1
+    gt
+    if-true UPDATE_MAX
+    jmp NEXT
+UPDATE_MAX:
+    push *pointer 0
+    pop local 1
+NEXT:
+    push pointer 0
+    push constant 1
+    add
+    pop pointer 0
+    push pointer 0
+    push pointer 1
+    lt
+    if-true LOOP
+    push local 1
+    push local 0
+    sub
     return
 RANGE_ZERO:
-    push constant 0  
+    push constant 0
     return
+
+
+function Sys.init 0
+    push constant 4
+    push constant 2
+    call Sys.range 2
+    push constant 2050
+    pop that
+    push constant 4
+    pop this
+    push constant -2
+    pop argument 0
+    push constant 1
+    pop argument 1
+    push constant 0
+    pop argument 2
+    push constant 9
+    pop argument 3
+WHILE:
+    goto WHILE
