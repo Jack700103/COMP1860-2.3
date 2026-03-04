@@ -1,0 +1,18 @@
+function Sys.range 2
+    push argument 1     
+    push constant 1
+    eq                 
+    if-true  RANGE_ZERO
+    push argument 0     
+    call Sys.min 1     
+    pop local 0         
+    push argument 0     
+    call Sys.max 1     
+    pop local 1         
+    push local 1        
+    push local 0        
+    sub                
+    return
+label RANGE_ZERO
+    push constant 0     
+    return

@@ -1,0 +1,12 @@
+function Sys.min 0
+    push argument 0     
+    push argument 1     
+    lt                 
+    if-true   LT_TRUE  
+    if-false  LT_FALSE
+label LT_TRUE
+    push argument 0    
+    return
+label LT_FALSE
+    push argument 1     
+    return
