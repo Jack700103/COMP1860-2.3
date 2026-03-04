@@ -2,78 +2,104 @@ function Sys.min 0
     push argument 0
     push argument 1
     lt
-    if-goto MIN_IS_ARG0
-    push argument 1
-    return
-(MIN_IS_ARG0)
+    if-true MIN_FIRST
+    if-false MIN_SECOND
+MIN_FIRST:
     push argument 0
+    return
+MIN_SECOND:
+    push argument 1
     return
 
 function Sys.max 0
     push argument 0
     push argument 1
     gt
-    if-goto MAX_IS_ARG0
-    push argument 1
-    return
-(MAX_IS_ARG0)
+    if-true MAX_FIRST
+    if-false MAX_SECOND
+MAX_FIRST:
     push argument 0
+    return
+MAX_SECOND:
+    push argument 1
     return
 
 function Sys.range 2
     push argument 1
+    push constant 1
+    eq
+    if-true RANGE_ZERO
+    push argument 0
+    pop pointer 0
     push constant 0
+    pop local 0
+    push constant 0
+    pop local 1
+    push argument 0
+    push argument 1
+    add
+    push constant 1
     sub
-    if-gt INIT_LOOP
+    pop local 2
+LOOP:
+    push pointer 0
+    push local 2
+    gt
+    if-true LOOP_END
+    push *pointer 0
+    push local 0
+    lt
+    if-true UPDATE_MIN
+    jmp CONTINUE
+UPDATE_MIN:
+    push *pointer 0
+    pop local 0
+CONTINUE:
+    push *pointer 0
+    push local 1
+    gt
+    if-true UPDATE_MAX
+    jmp NEXT
+UPDATE_MAX:
+    push *pointer 0
+    pop local 1
+NEXT:
+    push pointer 0
+    push constant 1
+    add
+    pop pointer 0
+    jmp LOOP
+LOOP_END:
+    push local 1
+    push local 0
+    sub
+    return
+RANGE_ZERO:
+    push argument 1
+    push constant 1
+    eq
+    if-true TEST_N1
     push constant 0
     return
-(INIT_LOOP)
-    push argument 0
-    pop pointer 0
-    push this 0
-    pop local 0
-    push this 0
-    pop local 1
-    push constant 1
-    pop local 2
-(LOOP)
-    push local 2
-    push argument 1
-    sub
-    if-gte END_LOOP
-    push argument 0
-    push local 2
-    add
-    pop pointer 0
-    push this 0
-    pop local 3
-    push local 3
-    push local 0
-    call Sys.min 2
-    pop local 0
-    push local 3
-    push local 1
-    call Sys.max 2
-    pop local 1
-    push local 2
-    push constant 1
-    add
-    pop local 2
-    goto LOOP
-(END_LOOP)
-    push local 1
-    push local 0
-    sub
+TEST_N1:
+    push constant 0
     return
 
 function Sys.init 0
-    push constant 256
-    pop pointer 1
-    push that 0
-    push that 1
+    push constant 2048
+    pop pointer 0
+    push constant 4
+    pop this 0
+    push constant -2
+    pop *pointer 0
+    push constant 1
+    pop *(pointer 0+1)
+    push constant 0
+    pop *(pointer 0+2)
+    push constant 9
+    pop *(pointer 0+3)
+    push constant 2048
+    push constant 4
     call Sys.range 2
-    push constant 256
-    pop pointer 1
-    pop that 0
-(WHILE)
+WHILE:
     goto WHILE
