@@ -12,11 +12,12 @@ function Sys.min 0
     push argument 0
     push argument 1
     lt
-    if-goto SYS_MIN_ARG0_LT_ARG1
+    if-goto MIN_ARG0
     push argument 1
-    return
-(SYS_MIN_ARG0_LT_ARG1)
+    goto MIN_END
+label MIN_ARG0
     push argument 0
+label MIN_END
     return
 
 
@@ -34,11 +35,12 @@ function Sys.max 0
     push argument 0
     push argument 1
     gt
-    if-goto SYS_MAX_ARG0_GT_ARG1
+    if-goto MAX_ARG0
     push argument 1
-    return
-(SYS_MAX_ARG0_GT_ARG1)
+    goto MAX_END
+label MAX_ARG0
     push argument 0
+label MAX_END
     return
 
 
@@ -49,7 +51,7 @@ function Sys.max 0
 //   ARG0 - memory location where the array starts, and
 //   ARG1 - number of elements in the array.
 // To call this function, you should:
-//   1. push the address of the first array elementonto the stack;
+//   1. push the address of the first array element onto the stack;
 //   2. push the number of array elements onto the stack; and
 //   2. call this function with `call Sys.range 2`.
 // Before returning, the function pushes the result onto the
@@ -57,67 +59,60 @@ function Sys.max 0
 // result is at the top of the stack.
 //
 function Sys.range 2
-    // Handle edge case: if n <= 1, return 0
-    push argument 1      // n (number of elements)
-    push constant 2
-    lt                   // n < 2 means n <= 1
-    if-goto SYS_RANGE_RETURN_ZERO
+    push argument 1
+    push constant 1
+    gt
+    not
+    if-goto RANGE_RETURN_ZERO
 
-    // Initialize min and max with first array element
-    push argument 0      // base address of array
-    pop pointer 1        // THAT = array base address
-    push that 0          // array[0] value
-    pop local 0          // local 0 = min = array[0]
+    push argument 0
+    pop pointer 1
     push that 0
-    pop local 1          // local 1 = max = array[0]
+    pop local 0
+    push that 0
+    pop local 1
 
-    // Process remaining elements starting from index 1
-    push constant 1      // i = 1
-    pop temp 0           // temp 0 holds loop index
+    push argument 1
+    push constant 1
+    sub
+    pop temp 0
 
-(SYS_RANGE_LOOP)
-    // Check if i < n
-    push temp 0          // current index i
-    push argument 1      // number of elements n
-    lt                   // i < n?
-    if-goto SYS_RANGE_PROCESS_ELEMENT
-    goto SYS_RANGE_DONE
+label RANGE_LOOP
+    push temp 0
+    push constant 0
+    eq
+    if-goto RANGE_END_LOOP
 
-(SYS_RANGE_PROCESS_ELEMENT)
-    // Calculate address of array[i]: base + i
-    push argument 0      // array base address
-    push temp 0          // current index i
-    add                  // base + i
-    pop pointer 1        // THAT points to array[i]
+    push pointer 1
+    push constant 1
+    add
+    pop pointer 1
 
-    // Update min using Sys.min
-    push local 0         // current min
-    push that 0          // array[i]
+    push that 0
+
+    push local 0
+    push that 0
     call Sys.min 2
-    pop local 0          // updated min
+    pop local 0
 
-    // Update max using Sys.max
-    push local 1         // current max
-    push that 0          // array[i]
+    push local 1
+    push that 0
     call Sys.max 2
-    pop local 1          // updated max
+    pop local 1
 
-    // Increment index
-    push temp 0          // current index
-    push constant 1      // 1
-    add                  // index + 1
-    pop temp 0           // store back
+    push temp 0
+    push constant 1
+    sub
+    pop temp 0
+    goto RANGE_LOOP
 
-    goto SYS_RANGE_LOOP
-
-(SYS_RANGE_DONE)
-    // Calculate range: max - min
-    push local 1         // max
-    push local 0         // min
-    sub                  // max - min
+label RANGE_END_LOOP
+    push local 1
+    push local 0
+    sub
     return
 
-(SYS_RANGE_RETURN_ZERO)
+label RANGE_RETURN_ZERO
     push constant 0
     return
 
