@@ -1,0 +1,63 @@
+function Sys.range 2
+    // Check if n <= 1 → if n < 2, return 0
+    push argument 1
+    push constant 2
+    lt
+    if-goto RETURN_ZERO
+
+    // Load first element: arr[0]
+    push argument 0
+    pop pointer 1       // THAT = &arr[0]
+    push that 0
+    pop local 0         // min = arr[0]
+    push that 0
+    pop local 1         // max = arr[0]
+
+    push constant 1
+    pop local 2         // i = 1
+
+(LOOP)
+    // Check if i < n
+    push local 2
+    push argument 1
+    lt
+    if-goto IN_LOOP
+    goto END_LOOP
+
+(IN_LOOP)
+    // Compute address = base + i
+    push argument 0
+    push local 2
+    add
+    pop pointer 1       // THAT = &arr[i]
+
+    // Update min: min = Sys.min(min, arr[i])
+    push local 0
+    push that 0
+    call Sys.min 2
+    pop local 0
+
+    // Update max: max = Sys.max(max, arr[i])
+    push local 1
+    push that 0
+    call Sys.max 2
+    pop local 1
+
+    // i = i + 1
+    push local 2
+    push constant 1
+    add
+    pop local 2
+
+    goto LOOP
+
+(END_LOOP)
+    // result = max - min
+    push local 1
+    push local 0
+    sub
+    return
+
+(RETURN_ZERO)
+    push constant 0
+    return
