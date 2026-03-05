@@ -12,10 +12,10 @@ function Sys.min 0
     push argument 0
     push argument 1
     lt
-    if-goto MIN_ARG0
+    if-goto RETURN_ARG0_MIN
     push argument 1
     return
-(MIN_ARG0)
+(RETURN_ARG0_MIN)
     push argument 0
     return
 
@@ -35,10 +35,10 @@ function Sys.max 0
     push argument 0
     push argument 1
     gt
-    if-goto MAX_ARG0
+    if-goto RETURN_ARG0_MAX
     push argument 1
     return
-(MAX_ARG0)
+(RETURN_ARG0_MAX)
     push argument 0
     return
 
@@ -58,12 +58,12 @@ function Sys.max 0
 // stack, so that, from the point of view of the callee, the
 // result is at the top of the stack.
 //
-function Sys.range 3
+function Sys.range 2
     // Check if n <= 1
     push argument 1
     push constant 2
     lt
-    if-goto RANGE_RETURN_ZERO
+    if-goto RETURN_ZERO_RANGE
 
     // Initialize min and max with the first array element
     push argument 0      // array base address
@@ -73,22 +73,22 @@ function Sys.range 3
     push that 0
     pop local 1          // local 1 = max = array[0]
 
-    // Initialize loop counter
+    // Use temp 0 as loop counter, starting from 1
     push constant 1
-    pop local 2          // local 2 = i = 1
+    pop temp 0           // temp 0 = i = 1
 
-(RANGE_LOOP)
+(LOOP_RANGE)
     // Check if i < n
-    push local 2         // i
+    push temp 0          // i
     push argument 1      // n
     lt
-    if-goto RANGE_PROCESS_ELEMENT
-    goto RANGE_END_LOOP
+    if-goto PROCESS_ELEMENT_RANGE
+    goto END_LOOP_RANGE
 
-(RANGE_PROCESS_ELEMENT)
+(PROCESS_ELEMENT_RANGE)
     // Calculate address of array[i]: base_addr + i
     push argument 0      // base address
-    push local 2         // i
+    push temp 0          // i
     add                  // address = base + i
     pop pointer 1        // THAT points to array[i]
 
@@ -105,21 +105,21 @@ function Sys.range 3
     pop local 1          // store new max
 
     // Increment i
-    push local 2
+    push temp 0
     push constant 1
     add
-    pop local 2
+    pop temp 0
 
-    goto RANGE_LOOP
+    goto LOOP_RANGE
 
-(RANGE_END_LOOP)
+(END_LOOP_RANGE)
     // Calculate range: max - min
     push local 1         // max
     push local 0         // min
     sub                  // max - min
     return
 
-(RANGE_RETURN_ZERO)
+(RETURN_ZERO_RANGE)
     push constant 0
     return
 
