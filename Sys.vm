@@ -1,107 +1,144 @@
+//// COMPUTE THE MINIMUM OF TWO VALUES
+// This function takes two arguments and pushes the smaller of
+// them onto the stack. To call this function, you should:
+//   1. push two values onto the stack; and
+//   2. call this function with `call Sys.min 2`.
+// Before returning, the function pushes the result onto the
+// stack, so that, from the point of view of the callee, the
+// result is at the top of the stack.
+// Push to the stack the minimum of two arguments.
+//
 function Sys.min 0
+    // Your implementation goes here.
     push argument 0
     push argument 1
-    sub
-    if-gt PUSH_ARG1
-    push argument 0
-    return
-(PUSH_ARG1)
+    lt
+    if-goto RETURN_ARG0
     push argument 1
     return
+(RETURN_ARG0)
+    push argument 0
+    return
 
 
 
+//// COMPUTE THE MAXIMUM OF TWO VALUES
+// This function takes two arguments and pushes the larger of
+// them onto the stack. To call this function, you should:
+//   1. push two values onto the stack; and
+//   2. call this function with `call Sys.max 2`.
+// Before returning, the function pushes the result onto the
+// stack, so that, from the point of view of the callee, the
+// result is at the top of the stack.
+// Push to the stack the minimum of two arguments.
+//
 function Sys.max 0
+    // Your implementation goes here.
     push argument 0
     push argument 1
-    sub
-    if-lt PUSH_ARG1
-    push argument 0
-    return
-(PUSH_ARG1)
+    gt
+    if-goto RETURN_ARG0
     push argument 1
     return
+(RETURN_ARG0)
+    push argument 0
+    return
 
 
 
+//// COMPUTE THE RANGE OF AN ARRAY.
+// This function takes two arguments, representing an array of
+// integers, and returns the range of the array onto the stack.
+// The two arguments are:
+//   ARG0 - memory location where the array starts, and
+//   ARG1 - number of elements in the array.
+// To call this function, you should:
+//   1. push the address of the first array elementonto the stack;
+//   2. push the number of array elements onto the stack; and
+//   2. call this function with `call Sys.range 2`.
+// Before returning, the function pushes the result onto the
+// stack, so that, from the point of view of the callee, the
+// result is at the top of the stack.
+//
 function Sys.range 2
-    
-    push argument 1       
-    push constant 1
-    sub                   
-    if-lt RETURN_ZERO     
-    if-eq RETURN_ZERO     
-    
+    // Your implementation goes here.
+    // Check if n <= 1 → if n < 2, return 0
+    push argument 1
+    push constant 2
+    lt
+    if-goto RETURN_ZERO
+
+    // Load first element: arr[0]
     push argument 0
-    pop that
-    
+    pop pointer 1       // THAT = &arr[0]
     push that 0
-    pop local 0           
+    pop local 0         // min = arr[0]
     push that 0
-    pop local 1          
-    
+    pop local 1         // max = arr[0]
+
+    push constant 1
+    pop local 2         // i = 1
+
+(LOOP)
+    // Check if i < n
+    push local 2
     push argument 1
-    push constant 1
-    sub
-    pop argument 1        
-    
-    push that
-    push constant 1
+    lt
+    if-goto IN_LOOP
+    goto END_LOOP
+
+(IN_LOOP)
+    // Compute address = base + i
+    push argument 0
+    push local 2
     add
-    pop that
-    
-(LOOP_START)
-    push argument 1
-    push constant 0
-    sub
-    if-lt LOOP_END        
-    if-eq LOOP_END        
-    
-    push that 0
-    pop temp 0
-    
+    pop pointer 1       // THAT = &arr[i]
+
+    // Update min: min = Sys.min(min, arr[i])
     push local 0
-    push temp 0
+    push that 0
     call Sys.min 2
     pop local 0
-    
+
+    // Update max: max = Sys.max(max, arr[i])
     push local 1
-    push temp 0
+    push that 0
     call Sys.max 2
     pop local 1
-    
-    push that
+
+    // i = i + 1
+    push local 2
     push constant 1
     add
-    pop that
-    
-    push argument 1
-    push constant 1
-    sub
-    pop argument 1
-    
-    goto LOOP_START
-    
-(LOOP_END)
+    pop local 2
+
+    goto LOOP
+
+(END_LOOP)
+    // result = max - min
     push local 1
     push local 0
     sub
     return
-    
+
 (RETURN_ZERO)
     push constant 0
     return
 
 
 
+// The emulator will start executing from here. You can modify
+// the code below while testing and debugging your code, but
+// please revert your changes before submitting to Gradescope;
+// otherwise, your submission will most likely fail all tests.
+//
+// A better way to test your code is to use the supplied file
+//   Sys.tst
+// with the virtual machine emulator. Please do not submit this
+// file to Gradescope, as this will cause your submission to be
+// rejected.
+//
 function Sys.init 0
-    
-    push constant 256
-    pop pointer 1       
-    push that 0         
-    push that 1         
     call Sys.range 2
-    pop that 0          
-    
 label WHILE
     goto WHILE
