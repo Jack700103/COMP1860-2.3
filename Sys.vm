@@ -12,10 +12,10 @@ function Sys.min 0
     push argument 0
     push argument 1
     lt
-    if-goto RETURN_ARG0
+    if-goto MIN_ARG0
     push argument 1
     return
-(RETURN_ARG0)
+(MIN_ARG0)
     push argument 0
     return
 
@@ -35,10 +35,10 @@ function Sys.max 0
     push argument 0
     push argument 1
     gt
-    if-goto RETURN_ARG0
+    if-goto MAX_ARG0
     push argument 1
     return
-(RETURN_ARG0)
+(MAX_ARG0)
     push argument 0
     return
 
@@ -59,58 +59,67 @@ function Sys.max 0
 // result is at the top of the stack.
 //
 function Sys.range 3
+    // Check if n <= 1
     push argument 1
     push constant 2
     lt
-    if-goto RETURN_ZERO
+    if-goto RANGE_RETURN_ZERO
 
-    push argument 0
-    pop pointer 1
+    // Initialize min and max with the first array element
+    push argument 0      // array base address
+    pop pointer 1        // THAT points to array[0]
+    push that 0          // get array[0]
+    pop local 0          // local 0 = min = array[0]
     push that 0
-    pop local 0         
-    push that 0
-    pop local 1        
+    pop local 1          // local 1 = max = array[0]
 
+    // Initialize loop counter
     push constant 1
-    pop local 2
+    pop local 2          // local 2 = i = 1
 
-(LOOP)
-    push local 2
-    push argument 1
+(RANGE_LOOP)
+    // Check if i < n
+    push local 2         // i
+    push argument 1      // n
     lt
-    if-goto PROCESS_ELEMENT
-    goto END_LOOP
+    if-goto RANGE_PROCESS_ELEMENT
+    goto RANGE_END_LOOP
 
-(PROCESS_ELEMENT)
-    push argument 0
-    push local 2
-    add
-    pop pointer 1
+(RANGE_PROCESS_ELEMENT)
+    // Calculate address of array[i]: base_addr + i
+    push argument 0      // base address
+    push local 2         // i
+    add                  // address = base + i
+    pop pointer 1        // THAT points to array[i]
 
-    push local 0
-    push that 0
+    // Update min using Sys.min(array[i], current_min)
+    push local 0         // current min
+    push that 0          // array[i]
     call Sys.min 2
-    pop local 0
+    pop local 0          // store new min
 
-    push local 1
-    push that 0
+    // Update max using Sys.max(array[i], current_max)
+    push local 1         // current max
+    push that 0          // array[i]
     call Sys.max 2
-    pop local 1
+    pop local 1          // store new max
 
+    // Increment i
     push local 2
     push constant 1
     add
     pop local 2
 
-    goto LOOP
+    goto RANGE_LOOP
 
-(END_LOOP)
-    push local 1
-    push local 0
-    sub
+(RANGE_END_LOOP)
+    // Calculate range: max - min
+    push local 1         // max
+    push local 0         // min
+    sub                  // max - min
     return
 
-(RETURN_ZERO)
+(RANGE_RETURN_ZERO)
     push constant 0
     return
 
