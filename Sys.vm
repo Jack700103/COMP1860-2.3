@@ -1,141 +1,84 @@
-//// COMPUTE THE MINIMUM OF TWO VALUES
-// This function takes two arguments and pushes the smaller of
-// them onto the stack. To call this function, you should:
-//   1. push two values onto the stack; and
-//   2. call this function with `call Sys.min 2`.
-// Before returning, the function pushes the result onto the
-// stack, so that, from the point of view of the callee, the
-// result is at the top of the stack.
-// Push to the stack the minimum of two arguments.
-//
 function Sys.min 0
     push argument 0
     push argument 1
     lt
-    if-goto RETURN_ARG0_MIN
+    if-goto ARG0_LESS_THAN_ARG1
     push argument 1
     return
-(RETURN_ARG0_MIN)
+(ARG0_LESS_THAN_ARG1)
     push argument 0
     return
 
 
-
-//// COMPUTE THE MAXIMUM OF TWO VALUES
-// This function takes two arguments and pushes the larger of
-// them onto the stack. To call this function, you should:
-//   1. push two values onto the stack; and
-//   2. call this function with `call Sys.max 2`.
-// Before returning, the function pushes the result onto the
-// stack, so that, from the point of view of the callee, the
-// result is at the top of the stack.
-// Push to the stack the minimum of two arguments.
-//
 function Sys.max 0
     push argument 0
     push argument 1
     gt
-    if-goto RETURN_ARG0_MAX
+    if-goto ARG0_GREATER_THAN_ARG1
     push argument 1
     return
-(RETURN_ARG0_MAX)
+(ARG0_GREATER_THAN_ARG1)
     push argument 0
     return
 
 
-
-//// COMPUTE THE RANGE OF AN ARRAY.
-// This function takes two arguments, representing an array of
-// integers, and returns the range of the array onto the stack.
-// The two arguments are:
-//   ARG0 - memory location where the array starts, and
-//   ARG1 - number of elements in the array.
-// To call this function, you should:
-//   1. push the address of the first array elementonto the stack;
-//   2. push the number of array elements onto the stack; and
-//   2. call this function with `call Sys.range 2`.
-// Before returning, the function pushes the result onto the
-// stack, so that, from the point of view of the callee, the
-// result is at the top of the stack.
-//
 function Sys.range 2
-    // Check if n <= 1
     push argument 1
     push constant 2
     lt
-    if-goto RETURN_ZERO_RANGE
+    if-goto RETURN_ZERO
 
-    // Initialize min and max with the first array element
-    push argument 0      // array base address
-    pop pointer 1        // THAT points to array[0]
-    push that 0          // get array[0]
-    pop local 0          // local 0 = min = array[0]
+    push argument 0
+    pop pointer 1
     push that 0
-    pop local 1          // local 1 = max = array[0]
+    pop local 0
+    push that 0
+    pop local 1
 
-    // Use temp 0 as loop counter, starting from 1
     push constant 1
-    pop temp 0           // temp 0 = i = 1
+    pop temp 0
 
-(LOOP_RANGE)
-    // Check if i < n
-    push temp 0          // i
-    push argument 1      // n
+(LOOP)
+    push temp 0
+    push argument 1
     lt
-    if-goto PROCESS_ELEMENT_RANGE
-    goto END_LOOP_RANGE
+    if-goto PROCESS_ELEMENT
+    goto END_LOOP
 
-(PROCESS_ELEMENT_RANGE)
-    // Calculate address of array[i]: base_addr + i
-    push argument 0      // base address
-    push temp 0          // i
-    add                  // address = base + i
-    pop pointer 1        // THAT points to array[i]
+(PROCESS_ELEMENT)
+    push argument 0
+    push temp 0
+    add
+    pop pointer 1
 
-    // Update min using Sys.min(array[i], current_min)
-    push local 0         // current min
-    push that 0          // array[i]
-    call Sys.min 2
-    pop local 0          // store new min
+    push local 0
+    push that 0
+    call Sys.min 2   
+    pop local 0
 
-    // Update max using Sys.max(array[i], current_max)
-    push local 1         // current max
-    push that 0          // array[i]
+    push local 1
     call Sys.max 2
-    pop local 1          // store new max
+    pop local 1
 
-    // Increment i
     push temp 0
     push constant 1
     add
     pop temp 0
 
-    goto LOOP_RANGE
+    goto LOOP
 
-(END_LOOP_RANGE)
-    // Calculate range: max - min
-    push local 1         // max
-    push local 0         // min
-    sub                  // max - min
+(END_LOOP)
+    push local 1
+    push local 0
+    sub
     return
 
-(RETURN_ZERO_RANGE)
+(RETURN_ZERO)
     push constant 0
     return
 
 
 
-// The emulator will start executing from here. You can modify
-// the code below while testing and debugging your code, but
-// please revert your changes before submitting to Gradescope;
-// otherwise, your submission will most likely fail all tests.
-//
-// A better way to test your code is to use the supplied file
-//   Sys.tst
-// with the virtual machine emulator. Please do not submit this
-// file to Gradescope, as this will cause your submission to be
-// rejected.
-//
 function Sys.init 0
     call Sys.range 2
 label WHILE
